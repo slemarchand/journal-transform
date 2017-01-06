@@ -1,5 +1,6 @@
 package com.slemarchand.journaltransform.properties;
 
+import com.slemarchand.journaltransform.BaseTest;
 import com.slemarchand.journaltransform.test.util.TestUtil;
 import com.slemarchand.journaltransform.util.xml.XmlHelper;
 
@@ -14,17 +15,18 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class Properties2ContentTest {
+public class Properties2ContentTest extends BaseTest {
+	
 	@Test
 	public void testExecute() throws Exception {
 		
-		InputStream is = this.getClass().getResourceAsStream("/p2c_input.xml");
+		InputStream is = getResourceAsStream("/p2c_input.xml");
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
 		Map<Locale, Properties> propertiesByLocale = new HashMap<Locale, Properties>();
 		
 		Properties props = new Properties();
-		props.load(this.getClass().getResourceAsStream("/p2c.properties"));
+		props.load(getResourceAsStream("/p2c.properties"));
 		
 		propertiesByLocale.put(Locale.US, props);
 		
@@ -41,7 +43,7 @@ public class Properties2ContentTest {
 		actualOutput = TestUtil.formatXml(actualOutput);
 		
 		String expectedOutput = IOUtils.toString(
-				this.getClass().getResourceAsStream("/p2c_expected_output.xml"), "UTF-8");
+				getResourceAsStream("/p2c_expected_output.xml"), "UTF-8");
 	
 		expectedOutput = TestUtil.formatXml(expectedOutput);
 		

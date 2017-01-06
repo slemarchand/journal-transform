@@ -183,7 +183,7 @@ public class AlterLocales {
 			Node parent = sourceContentNode.getParentNode();
 
 			Element targetContentNode = (Element) xml.selectSingleNode(
-					document, "dynamic-content[@language-id='" + targetLocale
+					parent, "dynamic-content[@language-id='" + targetLocale
 							+ "']");
 
 			if (targetContentNode == null) {

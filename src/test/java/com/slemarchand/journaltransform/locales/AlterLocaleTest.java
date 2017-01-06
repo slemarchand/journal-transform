@@ -1,5 +1,6 @@
-package com.slemarchand.journaltransform.properties;
+package com.slemarchand.journaltransform.locales;
 
+import com.slemarchand.journaltransform.BaseTest;
 import com.slemarchand.journaltransform.locales.AlterLocales;
 import com.slemarchand.journaltransform.test.util.TestUtil;
 import com.slemarchand.journaltransform.util.xml.XmlHelper;
@@ -12,15 +13,16 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AlterContentLocaleTest {
+public class AlterLocaleTest extends BaseTest {
+	
 	@Test
 	public void testExecute() throws Exception {
 		
-		InputStream is = this.getClass().getResourceAsStream("/acl_input.xml");
+		InputStream is = getResourceAsStream("/al_input.xml");
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		
+
 		AlterLocales acl = new AlterLocales(new XmlHelper());
-		
+
 		acl
 		.contentInput(is)
 		.contentOutput(os)
@@ -34,8 +36,8 @@ public class AlterContentLocaleTest {
 		actualOutput = TestUtil.formatXml(actualOutput);
 		
 		String expectedOutput = IOUtils.toString(
-				this.getClass().getResourceAsStream("/acl_expected_output.xml"), "UTF-8");
-	
+				getResourceAsStream("/al_expected_output.xml"), "UTF-8");
+
 		expectedOutput = TestUtil.formatXml(expectedOutput);
 		
 		System.out.println(expectedOutput);
@@ -44,4 +46,6 @@ public class AlterContentLocaleTest {
 		
 		Assert.assertEquals(expectedOutput, actualOutput);
 	}
+	
+
 }
