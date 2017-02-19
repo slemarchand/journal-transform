@@ -71,7 +71,7 @@ public class XmlHelper {
 
 		try {
 			JAXBContext context = JAXBContext
-					.newInstance(Content2PropertiesXmlConfig.class);
+					.newInstance(clazz);
 
 			Unmarshaller unmarshaller = context.createUnmarshaller();
 
