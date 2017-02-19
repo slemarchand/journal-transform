@@ -20,8 +20,6 @@ public class TestUtil {
 	
 	public static String formatXml(String xml) throws JDOMException, IOException {
 		
-		System.out.println(xml);
-		
         Document doc = new SAXBuilder().build(new StringReader(xml));
         
         sortAttributes(doc.getRootElement());

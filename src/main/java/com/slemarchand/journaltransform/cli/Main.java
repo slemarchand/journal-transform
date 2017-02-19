@@ -8,6 +8,7 @@ public class Main {
 	private final static Map<String,Command> COMMAND_MAP = new  HashMap<String, Command>(); 
 	
 	static {
+		COMMAND_MAP.put("alter-locales", new AlterLocalesCommand());
 		COMMAND_MAP.put("properties2content", new Properties2ContentCommand());
 	}
 

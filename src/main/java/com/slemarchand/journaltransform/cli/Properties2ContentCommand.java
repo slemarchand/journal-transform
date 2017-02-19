@@ -13,6 +13,7 @@ public class Properties2ContentCommand implements Command {
 		
 		if(args.size() < 2) {
 			System.err.println("usage: properties2content <properties-directory> <content-directory>");
+			return;
 		}
 		
 		Properties2ContentBatch batch = new Properties2ContentBatch();
