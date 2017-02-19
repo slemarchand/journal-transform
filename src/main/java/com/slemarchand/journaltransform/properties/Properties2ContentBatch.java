@@ -4,6 +4,8 @@ import com.slemarchand.journaltransform.ContentsDirectoryWalker;
 import com.slemarchand.journaltransform.util.xml.XmlException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -34,7 +36,7 @@ public class Properties2ContentBatch extends ContentsDirectoryWalker {
 		return this;
 	}
 
-	public Properties2ContentBatch propertiesTargetDirectory(File directory) {
+	public Properties2ContentBatch propertiesSourceDirectory(File directory) {
 
 		if (directory.exists() && !directory.isDirectory()) {
 			throw new IllegalArgumentException("Not a directory: "
@@ -46,12 +48,12 @@ public class Properties2ContentBatch extends ContentsDirectoryWalker {
 		return this;
 	}
 
-	public Properties2ContentBatch propertiesTargetDirectory(
+	public Properties2ContentBatch propertiesSourceDirectory(
 			String directoryPathname) {
 
 		File directory = new File(directoryPathname);
 
-		this.propertiesTargetDirectory(directory);
+		this.propertiesSourceDirectory(directory);
 
 		return this;
 	}
@@ -82,11 +84,21 @@ public class Properties2ContentBatch extends ContentsDirectoryWalker {
 			@Override
 			public boolean accept(File f, String name) {
 				
-				return f.isFile() && name.endsWith(".properties");
+				boolean accept = name.endsWith(".properties");
+				
+				return accept;
 			}
 		});
 		
+		if (propertiesFiles.length == 0) {
+			throw new IllegalStateException(
+					"No .properties file found into directory "
+							+ propertiesSourceDirectory);
+		}
+		
 		for (File propertiesFile : propertiesFiles) {
+			
+			System.out.println("Loading " + propertiesFile + "...");
 			
 			loadPropertiesFile(propertiesFile);
 		}
@@ -97,11 +109,13 @@ public class Properties2ContentBatch extends ContentsDirectoryWalker {
 		return this;
 	}
 
-	protected void loadPropertiesFile(File file) {
-		
-		Locale locale;
+	protected void loadPropertiesFile(File file) throws Exception, IOException {
 		
 		Properties props = new Properties();
+		
+		props.load(new FileReader(file));
+		
+		Locale locale;
 		
 		String fileName = file.getName();
 		
@@ -129,6 +143,8 @@ public class Properties2ContentBatch extends ContentsDirectoryWalker {
 			}
 			
 			propertiesByLocale.put(locale, props);
+			
+			System.out.println(props.size() + " properties loaded for " + file);
 		}
 		
 	}
@@ -139,7 +155,7 @@ public class Properties2ContentBatch extends ContentsDirectoryWalker {
 		System.out.println("Processing " + file);
 		
 		final String keyPrefix = getKeyPrefix(file);
-		
+
 		Properties2Content properties2Content = new Properties2Content();
 		
 		properties2Content.propertiesByLocale(propertiesByLocale);
@@ -153,13 +169,14 @@ public class Properties2ContentBatch extends ContentsDirectoryWalker {
 		properties2Content.execute();
 	}
 	
+	/*
 	protected String getKeyPrefix(File file) {
 		
 		String keyPrefix;
 		
 		String relativePath = file.getPath().replace(
 				this.contentsDirectory.getPath() + File.separator,
-				"").concat(".");
+				"");
 
 		if(keyPrefixFactory != null) {
 			
@@ -168,9 +185,23 @@ public class Properties2ContentBatch extends ContentsDirectoryWalker {
 			
 		} else {
 			
-			keyPrefix = relativePath;
+			keyPrefix = relativePath.;
 		}
 		
 		return keyPrefix;
-	}
+	}*/
+	
+	
+	public String getKeyPrefix(File file) {	
+	
+		String relativePath = file.getPath().replace(
+				this.contentsDirectory.getPath() + File.separator,
+				"").concat(".");
+		
+		String keyPrefix = relativePath.replaceAll(" ","-").toLowerCase();
+
+		keyPrefix = keyPrefix.replace(".xml", "");
+		
+		return keyPrefix;
+	}	
 }

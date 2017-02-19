@@ -3,6 +3,7 @@ package com.slemarchand.journaltransform.properties;
 import com.slemarchand.journaltransform.util.xml.XmlException;
 import com.slemarchand.journaltransform.util.xml.XmlHelper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,13 +26,19 @@ public class Properties2Content {
 
 	private InputStream contentInput;
 	
-	private OutputStream contentOutput;
+	private File contentInputFile;
+	
+	private OutputStream contentOutputStream;
+	
+	private File contentOutputFile;
 
 	private Map<Locale, Properties> propertiesByLocale;
 
 	private XmlHelper xml;
 	
 	private Document document;
+	
+	private int updatedFieldsCount;
 	
 	public Properties2Content() {
 		this(new XmlHelper());
@@ -61,30 +68,47 @@ public class Properties2Content {
 		
 		this.contentInput = contentInput;
 		
+		this.contentInputFile = null;
+		
 		return this;
 	}
 	
 	public Properties2Content contentInput(File contentInput) throws FileNotFoundException {
 		
-		return contentInput(new FileInputStream(contentInput));
+		this.contentInputFile = contentInput;
+		
+		this.contentInput = new FileInputStream(contentInput);
+	
+		return this;
 	}
 	
 	public Properties2Content contentOutput(OutputStream contentOutput) {
 		
-		this.contentOutput = contentOutput;
+		this.contentOutputStream = contentOutput;
+		
+		this.contentOutputFile = null;
 		
 		return this;
 	}
 	
 	public Properties2Content contentOutput(File contentOutput) throws FileNotFoundException {
 		
-		return contentOutput(new FileOutputStream(contentOutput));
+		this.contentOutputFile = contentOutput;
+		
+		this.contentOutputStream = null;
+		
+		return this;
+	}
+	
+	public int getUpdatedFieldsCount() {
+		return updatedFieldsCount;
 	}
 	
 	public void execute() throws XmlException, IOException {
 		
-		document  = xml.parse(contentInput);
+		updatedFieldsCount = 0;
 		
+		document  = xml.parse(contentInput);
 		contentInput.close();
 		
 		for (Entry<Locale, Properties> e: propertiesByLocale.entrySet()) {
@@ -95,10 +119,34 @@ public class Properties2Content {
 		
 		document.setXmlStandalone(true);
 		
-		xml.write(document, contentOutput);
+		ByteArrayOutputStream contentByteArrayOutputStream = null;
 		
-		contentOutput.flush();
-		contentOutput.close();
+		if(contentOutputStream == null) {
+			contentByteArrayOutputStream = new ByteArrayOutputStream();
+			
+			contentOutputStream = contentByteArrayOutputStream;
+		}
+		
+		// Write output XML document
+		xml.write(document, contentOutputStream);
+		contentOutputStream.flush();
+		contentOutputStream.close();
+		
+		System.out.println(updatedFieldsCount);
+		
+		if(contentOutputFile != null) {
+			if(updatedFieldsCount > 0 || !contentOutputFile.equals(contentInputFile)) {
+				FileOutputStream contentFileOutputStream = new FileOutputStream(contentOutputFile);
+				try {
+					System.out.println("Writing " + contentOutputFile + "...");
+					contentFileOutputStream.write(contentByteArrayOutputStream
+							.toByteArray());
+					contentFileOutputStream.flush();
+				} finally {
+					contentFileOutputStream .close();
+				}
+			} 
+		}
 	}
 	
 	protected void processLocaleProperties(Locale locale, Properties properties) throws XmlException  {
@@ -122,6 +170,8 @@ public class Properties2Content {
 
 	protected void processLocaleProperty(Locale locale, String key, String value) throws XmlException {
 		
+		System.out.println("Processing " + key + " [" + locale + "]");
+		
 		Element root = (Element) xml.selectSingleNode(document, "root");
 		
 		Element dynamicElement = findDynamicElement(root, key);
@@ -129,11 +179,22 @@ public class Properties2Content {
 		Element dynamicContent = (Element)xml.selectSingleNode(dynamicElement,
 				"dynamic-content[@language-id='" + locale.toString() + "']");
 		
-		CDATASection cdata = document.createCDATASection(value);
+		if(dynamicContent == null) {
+			throw new IllegalStateException("<dynamic-content language-id=\"" 
+			+ locale + "\"> child is missing");
+		}
+		
+		String oldValue = dynamicContent.getTextContent();
 		
 		dynamicContent.setTextContent("");
 		
+		CDATASection cdata = document.createCDATASection(value);
+		
 		dynamicContent.appendChild(cdata);
+		
+		if(!value.equals(oldValue)) {
+			updatedFieldsCount++;
+		}
 	}
 	
 	protected Element findDynamicElement(Element ancestor, String key) throws XmlException  {
@@ -183,7 +244,8 @@ public class Properties2Content {
 			
 			} 
 		} else {
-			throw new IllegalStateException("<dynamic-element name=\"" + childName+"\"> is missing");
+			throw new IllegalStateException("<dynamic-element name=\""
+					+ childName + "\"> is missing");
 		}
 	}
 }

@@ -48,5 +48,7 @@ public class Properties2ContentTest extends BaseTest {
 		expectedOutput = TestUtil.formatXml(expectedOutput);
 		
 		Assert.assertEquals(expectedOutput, actualOutput);
+		
+		Assert.assertTrue(p2c.getUpdatedFieldsCount() > 0);
 	}
 }
