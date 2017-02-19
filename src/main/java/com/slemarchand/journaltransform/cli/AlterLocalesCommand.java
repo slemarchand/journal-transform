@@ -7,6 +7,7 @@ import java.util.Locale;
 
 public class AlterLocalesCommand implements Command {
 	
+	@Override
 	public void execute(Arguments arguments) throws Exception {
 		
 		List<String> args = arguments.getStandardArguments();
@@ -97,10 +98,9 @@ public class AlterLocalesCommand implements Command {
 	}
 
 	private String usage() {
-		String usage = "usage: alterLocales <content-directory>" +
+		return "usage: alterLocales <content-directory>" +
 				" [--copy-locale=<target-locale-1><-<source-locale-1>[,<target-locale-n><-<source-locale-n>]*]" + 
 				" [--remove-locale=<locale-to-remove-1>[,<locale-to-remove-n>]*]" +
 				" [--default-locale=<default-locale>]";
-		return usage;
 	}
 }
