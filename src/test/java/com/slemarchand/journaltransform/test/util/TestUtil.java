@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -51,20 +52,24 @@ public class TestUtil {
 		StringWriter sw = new StringWriter();
 		props.store( sw, "");
 		
-		String formattedProps = sortLines(sw.toString());
+		List<String> lines = IOUtils.readLines(new StringReader(sw.toString()));
+		
+		Collections.sort(lines);
+		for (Iterator<String> iterator = lines.iterator(); iterator.hasNext();) {
+			String line = iterator.next();
+			if(line.trim().startsWith("#")) {
+				iterator.remove();
+			}
+		}
+		
+		sw = new StringWriter();
+		IOUtils.writeLines(lines,"\n", sw);
+		
+		String formattedProps = sw.toString();
 		
 		return formattedProps;
 	}
 	
-	private static String sortLines(String s) throws IOException {
-		List<String> lines = IOUtils.readLines(new StringReader(s));
-        Collections.sort(lines);
-        StringWriter sw = new StringWriter();
-        IOUtils.writeLines(lines,"\n", sw);
-        
-        return sw.toString();
-	}
-
 	private static void sortAttributes(Element element) {
 		
 		List<Attribute> attributes = new ArrayList<Attribute>(element.getAttributes());
