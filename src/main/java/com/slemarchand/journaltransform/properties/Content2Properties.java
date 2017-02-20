@@ -1,5 +1,6 @@
 package com.slemarchand.journaltransform.properties;
 
+import com.slemarchand.journaltransform.util.LanguageId;
 import com.slemarchand.journaltransform.util.xml.XmlException;
 import com.slemarchand.journaltransform.util.xml.XmlHelper;
 
@@ -146,7 +147,7 @@ public class Content2Properties {
 		
 		String value = dynamicContent.getTextContent();
 		
-		Locale locale = new Locale(
+		Locale locale = LanguageId.toLocale(
 				dynamicContent.getAttribute("language-id"));
 
 		propertyContext.setKey(key);

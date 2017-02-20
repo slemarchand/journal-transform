@@ -12,7 +12,7 @@ public class Properties2ContentCommand implements Command {
 		List<String> args = arguments.getStandardArguments();
 		
 		if(args.size() < 2) {
-			System.err.println("usage: properties2content <properties-directory> <content-directory>");
+			System.err.println(usage());
 			return;
 		}
 		
@@ -24,6 +24,11 @@ public class Properties2ContentCommand implements Command {
 		
 		batch.execute();
 		
+	}
+	
+	private String usage() {
+		return "usage: properties2content" +
+				" <propertiesDirectory> <contentDirectory>";
 	}
 
 }

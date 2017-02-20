@@ -1,6 +1,7 @@
 package com.slemarchand.journaltransform.cli;
 
 import com.slemarchand.journaltransform.locales.AlterLocalesBatch;
+import com.slemarchand.journaltransform.util.LanguageId;
 
 import java.util.List;
 import java.util.Locale;
@@ -36,8 +37,8 @@ public class AlterLocalesCommand implements Command {
 				String target = copyLocaleAssignmentArray[0];
 				String source = copyLocaleAssignmentArray[1];
 				
-				Locale targetLocale = toLocale(target);
-				Locale sourceLocale = toLocale(source);
+				Locale targetLocale = LanguageId.toLocale(target);
+				Locale sourceLocale = LanguageId.toLocale(source);
 				
 				batch.copyLocale(sourceLocale, targetLocale);
 			}
@@ -53,7 +54,7 @@ public class AlterLocalesCommand implements Command {
 			String[] removeLocaleArgArray = removeLocaleArg.split(",");
 			
 			for (String removeLocaleItem: removeLocaleArgArray) {
-				Locale localeToRemove = toLocale(removeLocaleItem);
+				Locale localeToRemove = LanguageId.toLocale(removeLocaleItem);
 				batch.removeLocale(localeToRemove);
 			}
 		}
@@ -64,7 +65,7 @@ public class AlterLocalesCommand implements Command {
 		
 		if(defaultLocaleArg !=  null && !defaultLocaleArg.trim().isEmpty()) {
 			
-			Locale defaultLocale = toLocale(defaultLocaleArg);
+			Locale defaultLocale = LanguageId.toLocale(defaultLocaleArg);
 			
 			batch.defaultLocale(defaultLocale);
 		}
@@ -75,32 +76,11 @@ public class AlterLocalesCommand implements Command {
 	
 		batch.execute();
 	}
-	
-	private Locale toLocale(String localeString) {
-		
-		Locale locale;
-		
-		String[] parts = localeString.split("_");
-	
-		switch (parts.length) {
-		case 2:
-			locale = new Locale(parts[0], parts[1]);
-			break;
-		case 3:
-			locale = new Locale(parts[0], parts[1], parts[2]);
-			break;
-		default:
-			locale = new Locale(localeString);
-			break;
-		}
-		
-		return locale;
-	}
 
 	private String usage() {
-		return "usage: alterLocales <content-directory>" +
-				" [--copy-locale=<target-locale-1><-<source-locale-1>[,<target-locale-n><-<source-locale-n>]*]" + 
-				" [--remove-locale=<locale-to-remove-1>[,<locale-to-remove-n>]*]" +
-				" [--default-locale=<default-locale>]";
+		return "usage: alterLocales <contentDirectory>" +
+				" [--copy-locale=<targetLocale1><-<sourceLocale1>[,<targetLocaleN><-<sourceLocaleN>]*]" + 
+				" [--remove-locale=<localeToRemove1>[,<localeToRemoveN>]*]" +
+				" [--default-locale=<defaultLocale>]";
 	}
 }

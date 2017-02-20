@@ -16,7 +16,7 @@ import org.w3c.dom.Document;
 
 public class ContentFormatter {
 	
-	String format(Document doc) throws XmlException  {
+	public String format(Document doc) throws XmlException  {
 		Transformer transformer;
 		try {
 			transformer = TransformerFactory.newInstance().newTransformer();

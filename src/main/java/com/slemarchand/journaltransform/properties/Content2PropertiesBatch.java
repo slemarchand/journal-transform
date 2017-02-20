@@ -125,7 +125,7 @@ public class Content2PropertiesBatch extends ContentsDirectoryWalker {
 			Locale locale = e.getKey();
 
 			File propsFile = new File(this.propertiesTargetDirectory,
-					this.propertiesBasename + "_" + locale);
+					this.propertiesBasename + "_" + locale + ".properties");
 
 			FileWriter fw = new FileWriter(propsFile);
 

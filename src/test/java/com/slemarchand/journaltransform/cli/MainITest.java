@@ -36,41 +36,62 @@ public class MainITest {
 	@Test
 	public void testAlterLocales() throws IOException {
 		
+		String dataSetName = "alter-locales";
+		
+		copyInputDirectoryToOutputDirectory(dataSetName);
+		
 		test(new String[]{
 				"alter-locales",
-				getOutputDirectory("alter-locales"),
+				getOutputPath(dataSetName),
 				"--copy-locale=fr_FR<-en_US,ru_RU<-en_US",
 				"--remove-locale=en_US",
 				"--default-locale=fr_FR"
-				},"alter-locales");
+				}, dataSetName);
 	}
 	
-	String getOutputDirectory(String dataSetName) {
-		return new File(baseDirectory, dataSetName + "/output").getAbsolutePath();
+	@Test
+	public void testContent2Properties() throws IOException {
+		
+		String dataSetName = "content2properties";
+		
+		cleanOutputDirectory(dataSetName);
+		
+		test(new String[]{
+				"content2properties",
+				getInputPath(dataSetName),
+				getOutputPath(dataSetName)
+				}, dataSetName);
 	}
 	
-	void test(String[] args, String dataSetName) throws IOException {
+	@Test
+	public void testProperties2Content() throws IOException {
+		
+		String dataSetName = "properties2content";
+		
+		copyInputDirectoryToOutputDirectory(dataSetName);
+		
+		test(new String[]{
+				"properties2content",
+				getInputPath(dataSetName),
+				getOutputPath(dataSetName),
+				},"properties2content");
+	}
+	
+	private void test(String[] args, String dataSetName) throws IOException {
 		
 		System.out.println(baseDirectory);
 		
 		// Prepare files
-		
-		File outputDirectory = new File(getOutputDirectory(dataSetName));
-		
-		if(outputDirectory.exists()) {
-			FileUtils.deleteDirectory(outputDirectory);
-		}
-		
-		File inputDirectory = new File(baseDirectory, dataSetName + "/input");
-		
-		FileUtils.copyDirectory(inputDirectory, outputDirectory);
-		
+
+
 		// Execute
 		
 		Main.main(args);
 		
 		// Check !
 
+		File outputDirectory = getOutputDirectory(dataSetName);
+		
 		File expectedDirectory = new File(baseDirectory, dataSetName + "/expected");
 		
 		final Path outputDirectoryPath = Paths.get(outputDirectory.toURI());
@@ -94,7 +115,7 @@ public class MainITest {
 
 	    });
 	}
-	
+
 	private void checkOutputFile(Path expectedDirectoryPath, Path expectedFilePath, Path outputDirectoryPath) throws IOException {
         
 		// get the relative file name from path "expectedDirectoryPath"
@@ -120,6 +141,13 @@ public class MainITest {
 						toFormattedXml(expectedFile),
 						toFormattedXml(actualFile));
 
+			} else if(actualFile.getName().endsWith(".properties")) {
+			
+				assertEquals(
+						"The content for following file must be as expected: "
+								+ actualFile,
+						TestUtil.formatProperties(expectedFile),
+						TestUtil.formatProperties(actualFile));
 			} else {
 
 				assertEquals(
@@ -131,6 +159,42 @@ public class MainITest {
 										"UTF8"));
 			}
         }
+	}
+	
+	private File getInputDirectory(String dataSetName) {
+		return new File(baseDirectory, dataSetName + "/input");
+	}
+	
+	private String getInputPath(String dataSetName) {
+		return getInputDirectory(dataSetName).getAbsolutePath();
+	}
+
+	private File getOutputDirectory(String dataSetName) {
+		return new File(baseDirectory, dataSetName + "/output");
+	}
+	
+	private String getOutputPath(String dataSetName) {
+		return getOutputDirectory(dataSetName).getAbsolutePath();
+	}
+	
+	private void copyInputDirectoryToOutputDirectory(String dataSetName)
+			throws IOException {
+		
+		File outputDirectory = getOutputDirectory(dataSetName);
+				
+		File inputDirectory = getInputDirectory(dataSetName);
+		
+		cleanOutputDirectory(dataSetName);
+		
+		FileUtils.copyDirectory(inputDirectory, outputDirectory);
+	}
+
+	private void cleanOutputDirectory(String dataSetName) throws IOException {
+		File outputDirectory = getOutputDirectory(dataSetName);
+		
+		if(outputDirectory.exists()) {
+			FileUtils.deleteDirectory(outputDirectory);
+		}
 	}
 	
 	private String toFormattedXml(File file) throws IOException {

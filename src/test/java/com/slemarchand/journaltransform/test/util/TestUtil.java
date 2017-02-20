@@ -1,13 +1,19 @@
 package com.slemarchand.journaltransform.test.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Properties;
 
+import org.apache.commons.io.IOUtils;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -35,6 +41,28 @@ public class TestUtil {
 		String formattedXml = sw.toString();
 		
 		return formattedXml;
+	}
+	
+	public static String formatProperties(File propertiesFile) throws IOException {
+		
+		Properties props = new Properties();
+		props.load(new FileInputStream(propertiesFile));
+		
+		StringWriter sw = new StringWriter();
+		props.store( sw, "");
+		
+		String formattedProps = sortLines(sw.toString());
+		
+		return formattedProps;
+	}
+	
+	private static String sortLines(String s) throws IOException {
+		List<String> lines = IOUtils.readLines(new StringReader(s));
+        Collections.sort(lines);
+        StringWriter sw = new StringWriter();
+        IOUtils.writeLines(lines,"\n", sw);
+        
+        return sw.toString();
 	}
 
 	private static void sortAttributes(Element element) {

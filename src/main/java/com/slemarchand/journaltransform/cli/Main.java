@@ -10,6 +10,7 @@ public class Main {
 	static {
 		COMMAND_MAP.put("alter-locales", new AlterLocalesCommand());
 		COMMAND_MAP.put("properties2content", new Properties2ContentCommand());
+		COMMAND_MAP.put("content2properties", new Content2PropertiesCommand());
 	}
 
 	public static void main(String[] args) {
