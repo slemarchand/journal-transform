@@ -65,15 +65,18 @@ public class AlterLocalesBatch extends ContentsDirectoryWalker {
 
 	}
 
-	protected void processContentFile(final File file) throws JournalTransformException, IOException {
+	protected void processContentFile(final File file) throws JournalTransformException {
 
 		System.out.println("Processing " + file);
-		
 
-		acl
-		.contentInput(file)
-		.contentOutput(file);
-
-		acl.execute();
+		try {
+			acl
+			.contentInput(file)
+			.contentOutput(file)
+			.execute();
+			
+		} catch (IOException e) {
+			throw new JournalTransformException(e);
+		}
 	}
 }

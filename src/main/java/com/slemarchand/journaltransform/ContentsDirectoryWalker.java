@@ -29,9 +29,9 @@ public abstract class ContentsDirectoryWalker {
 	}
 	
 	protected abstract void processContentFile(final File file) 
-			throws Exception;
+			throws JournalTransformException ;
 
-	protected void processDirectory(File directory) throws Exception {
+	protected void processDirectory(File directory) throws JournalTransformException {
 			
 				File[] children = directory.listFiles(new FileFilter() {
 			

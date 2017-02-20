@@ -1,6 +1,7 @@
 package com.slemarchand.journaltransform.properties;
 
 import com.slemarchand.journaltransform.ContentsDirectoryWalker;
+import com.slemarchand.journaltransform.JournalTransformException;
 import com.slemarchand.journaltransform.util.xml.XmlException;
 
 import java.io.File;
@@ -150,7 +151,7 @@ public class Properties2ContentBatch extends ContentsDirectoryWalker {
 	}
 
 	@Override
-	protected void processContentFile(final File file) throws XmlException, IOException {
+	protected void processContentFile(final File file) throws JournalTransformException {
 
 		System.out.println("Processing " + file);
 		
@@ -162,11 +163,17 @@ public class Properties2ContentBatch extends ContentsDirectoryWalker {
 		
 		properties2Content.keyPrefix(keyPrefix);
 
-		properties2Content.contentInput(file);
+		try {
 		
-		properties2Content.contentOutput(file);
-
-		properties2Content.execute();
+			properties2Content.contentInput(file);
+			
+			properties2Content.contentOutput(file);
+	
+			properties2Content.execute();
+			
+		} catch(IOException e) {
+			throw new JournalTransformException(e);
+		}
 	}
 	
 	/*

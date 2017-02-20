@@ -1,6 +1,7 @@
 package com.slemarchand.journaltransform.properties;
 
 import com.slemarchand.journaltransform.ContentsDirectoryWalker;
+import com.slemarchand.journaltransform.JournalTransformException;
 import com.slemarchand.journaltransform.properties.Content2Properties.Property;
 import com.slemarchand.journaltransform.properties.Content2Properties.PropertyFilter;
 import com.slemarchand.journaltransform.util.xml.XmlException;
@@ -140,7 +141,7 @@ public class Content2PropertiesBatch extends ContentsDirectoryWalker {
 	}
 
 	@Override
-	protected void processContentFile(final File file) throws XmlException, FileNotFoundException {
+	protected void processContentFile(final File file) throws JournalTransformException {
 
 		System.out.println("Processing " + file);
 		
@@ -167,11 +168,16 @@ public class Content2PropertiesBatch extends ContentsDirectoryWalker {
 			content2properties.filter(new FilterAdapter(filter));	
 		}
 		
-		content2properties.keyPrefix(keyPrefix);
+		try {
+			content2properties.keyPrefix(keyPrefix);
+			
+			content2properties.content(new FileInputStream(file));
 
-		content2properties.content(new FileInputStream(file));
+			content2properties.execute();
 
-		content2properties.execute();
+		} catch (FileNotFoundException e) {
+			throw new JournalTransformException(e);
+		}
 	}
 	
 	protected String getKeyPrefix(File file) {
