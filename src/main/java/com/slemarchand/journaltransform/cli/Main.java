@@ -13,7 +13,7 @@ public class Main {
 		COMMAND_MAP.put("content2properties", new Content2PropertiesCommand());
 	}
 
-	public static void main(String[] args) {
+	public static int main(String[] args) {
 		
 		Arguments arguments = new Arguments(args);
 		
@@ -21,15 +21,20 @@ public class Main {
 		
 		Command command = COMMAND_MAP.get(commandName);
 		
+		int status = 0;
+		
 		if(command != null) {
 			try {
 				command.execute(arguments);	
 			} catch (Exception e) {
+				status = -1;
 				e.printStackTrace(System.err);
 			}
 		} else {
+			status = -1;
 			System.err.println("Unknown command " + commandName);
 		}	
+		
+		return status;
 	}
-	
 }

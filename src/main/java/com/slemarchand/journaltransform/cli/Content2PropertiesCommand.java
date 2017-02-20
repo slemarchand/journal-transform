@@ -1,6 +1,6 @@
 package com.slemarchand.journaltransform.cli;
 
-import com.slemarchand.journaltransform.cli.Content2PropertiesBatchCli.CustomBehavior;
+import com.slemarchand.journaltransform.cli.Content2PropertiesCommand.CustomBehavior;
 import com.slemarchand.journaltransform.properties.Content2PropertiesBatch;
 import com.slemarchand.journaltransform.properties.KeyPrefixFactory;
 import com.slemarchand.journaltransform.properties.Properties2ContentBatch;
@@ -10,14 +10,21 @@ import java.util.List;
 
 public class Content2PropertiesCommand implements Command {
 
+	public static interface CustomBehavior {
+		
+		public BatchPropertyFilter getPropertyFilter();
+		
+		public KeyPrefixFactory getKeyPrefixFactory();
+		
+	}
+
 	@Override
 	public void execute(Arguments arguments) throws Exception {
 	
 		List<String> args = arguments.getStandardArguments();
 		
 		if(args.size() < 2) {
-			System.err.println(usage());
-			return;
+			throw new CommandArgumentsException(usage());
 		}
 		
 		Content2PropertiesBatch batch = new Content2PropertiesBatch();
@@ -32,10 +39,10 @@ public class Content2PropertiesCommand implements Command {
 		if (customBehaviorArg != null && !customBehaviorArg.trim().isEmpty()) {
 
 			@SuppressWarnings("unchecked")
-			Class<? extends CustomBehavior> clazz = (Class<? extends CustomBehavior>) Class
+			Class<? extends Content2PropertiesCommand.CustomBehavior> clazz = (Class<? extends Content2PropertiesCommand.CustomBehavior>) Class
 					.forName(customBehaviorArg);
 
-			CustomBehavior behavior = clazz.newInstance();
+			Content2PropertiesCommand.CustomBehavior behavior = clazz.newInstance();
 
 			BatchPropertyFilter filter = behavior.getPropertyFilter();
 			if (filter != null) {
@@ -53,7 +60,6 @@ public class Content2PropertiesCommand implements Command {
 		}
 		
 		batch.execute();
-		
 	}
 
 	private String usage() {

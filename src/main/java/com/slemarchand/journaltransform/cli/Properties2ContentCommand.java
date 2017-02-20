@@ -4,7 +4,7 @@ import com.slemarchand.journaltransform.properties.Properties2ContentBatch;
 
 import java.util.List;
 
-public class Properties2ContentCommand implements Command {
+public class Properties2ContentCommand extends BaseCommand {
 
 	@Override
 	public void execute(Arguments arguments) throws Exception {
@@ -12,8 +12,7 @@ public class Properties2ContentCommand implements Command {
 		List<String> args = arguments.getStandardArguments();
 		
 		if(args.size() < 2) {
-			System.err.println(usage());
-			return;
+			throw new CommandArgumentsException(usage());		
 		}
 		
 		Properties2ContentBatch batch = new Properties2ContentBatch();
@@ -23,7 +22,6 @@ public class Properties2ContentCommand implements Command {
 		batch.articleTargetDirectory(args.get(1));
 		
 		batch.execute();
-		
 	}
 	
 	private String usage() {

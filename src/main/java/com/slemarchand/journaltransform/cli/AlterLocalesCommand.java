@@ -17,7 +17,7 @@ public class AlterLocalesCommand extends BaseCommand {
 			
 			logError(usage());
 			
-			System.exit(-1);
+			throw new CommandArgumentsException(usage());
 		}
 		
 		AlterLocalesBatch batch = new AlterLocalesBatch();
