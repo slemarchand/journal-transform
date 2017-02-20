@@ -6,7 +6,7 @@ import com.slemarchand.journaltransform.util.LanguageId;
 import java.util.List;
 import java.util.Locale;
 
-public class AlterLocalesCommand implements Command {
+public class AlterLocalesCommand extends BaseCommand {
 	
 	@Override
 	public void execute(Arguments arguments) throws Exception {
@@ -15,9 +15,9 @@ public class AlterLocalesCommand implements Command {
 		
 		if(args.size() < 1) {
 			
-			System.err.println(usage());
+			logError(usage());
 			
-			return;
+			System.exit(-1);
 		}
 		
 		AlterLocalesBatch batch = new AlterLocalesBatch();
