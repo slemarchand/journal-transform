@@ -20,17 +20,17 @@ public class ContentFormatter {
 		Transformer transformer;
 		try {
 			transformer = TransformerFactory.newInstance().newTransformer();
-		
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+			
 			//initialize StreamResult with File object to save to file
 			StreamResult result = new StreamResult(new StringWriter());
 			DOMSource source = new DOMSource(doc);
 			transformer.transform(source, result);
-			String xmlString = result.getWriter().toString();
-			return xmlString;
+			
+			return result.getWriter().toString();
 		} catch (TransformerFactoryConfigurationError | TransformerException e) {
-			throw new XmlException();
+			throw new XmlException(e);
 		}
 	}
 
